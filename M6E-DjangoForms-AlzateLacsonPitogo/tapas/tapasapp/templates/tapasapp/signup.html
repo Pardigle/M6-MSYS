@@ -1,6 +1,14 @@
 {% extends 'tapasapp/base.html' %}
 {% load static %}
 
+{% block alert %}
+    {% if error %}
+        <div class="alert alert-warning" role="alert">
+            {{ error }}
+        </div>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="col-md-8">
 
@@ -21,7 +29,7 @@
                     <div class="col-6">
                         <div class="form-group">
                             <label for="vintage"> Password: </label>
-                            <input type="text" class="form-control w-50" id="password" name="password">
+                            <input type="password" class="form-control w-50" id="password" name="password">
                         </div>
                     </div>
                 </div>
