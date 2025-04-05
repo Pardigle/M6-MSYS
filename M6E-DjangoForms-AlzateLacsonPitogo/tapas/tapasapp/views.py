@@ -36,30 +36,47 @@ def update_dish(request, pk):
         d = get_object_or_404(Dish, pk=pk)
         return render(request, 'tapasapp/update_menu.html', {'d':d})
     
-def login(request, username="", password=""):
+def login(request):
     if(request.method=="POST"):
-        button = request.POST.get("action")
+        button = request.POST.get("button")
+        username = request.POST.get("username")
+        password = request.POST.get("password")
 
         if button == "login":
-            credentials = Account.objects.filter(username=username)
-            if password == credentials.getPassword():
-                return redirect('better_menu')
+            if Account.objects.filter(username=username).exists():
+                credentials = Account.objects.get(username=username)
+                if password == credentials.getPassword():
+                    return redirect('better_menu')
+                else:
+                    return render(request, 'tapasapp/login.html', {'error': 'Incorrect password.'})
+            else:
+                return render(request, 'tapasapp/login.html', {'error': 'Account does not exist.'})
         
         elif button == "signup":
-            return redirect('signup', username=username, password=password)
+            return redirect('signup')
+        
 
     else:
         return render(request, 'tapasapp/login.html')
         
 
-def signup(request, username="", password=""):
+def signup(request):
     if(request.method=="POST"):
-        check_username = Account.objects.filter(username=username)
+        button = request.POST.get("button")
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        
+        if button == "signup":
+            check_username = len(Account.objects.filter(username=username))
 
-        if check_username == None:
-            Account.objects.create(username=username, password=password)
+            if check_username == 0:
+                Account.objects.create(username=username, password=password)
+                return redirect('login')
+            else:
+                return render(request, 'tapasapp/signup.html', {'error':'Username is already taken.'})
+            
+        elif button == "login":
             return redirect('login')
-
+        
     else:
-        a = username
-        return render(request, 'tapasapp/signup.html', {'a':a})
+        return render(request, 'tapasapp/signup.html')
