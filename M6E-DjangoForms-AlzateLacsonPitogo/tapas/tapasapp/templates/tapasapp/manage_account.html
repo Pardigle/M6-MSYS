@@ -15,7 +15,7 @@
             <p>
                 <form method="POST">{% csrf_token %}
                     <a href="{% url 'change_password' pk=user.pk %}"  class="btn btn-primary">Change password</a>
-                    <button name="delete_account" id="delete_account" class="btn btn-danger">Delete account</button>
+                    <button type="submit" name="button" value="delete_account" class="btn btn-danger">Delete account</button>
                     <a href="{% url 'basic_list' pk=user.pk %}"  class="btn btn-secondary">Back</a>
                 </form>
             </p>
