@@ -119,7 +119,7 @@ def login(request):
             return redirect('signup')
         
     else:
-        global message
+        message = request.session.pop('message', None)
         return render(request, 'tapasapp/login.html', {'message':message})
         
 
@@ -134,14 +134,10 @@ def signup(request):
 
             if not username_exists:
                 Account.objects.create(username=username, password=password)
-                global message
-                message = 'Account created successfully.'
+                request.session['message'] = 'Account created successfully.'
                 return redirect('login')
             else:
                 return render(request, 'tapasapp/signup.html', {'message':'Username is already taken.'})
-            
-        elif button == "login":
-            return redirect('login')
         
     else:
         return render(request, 'tapasapp/signup.html')
