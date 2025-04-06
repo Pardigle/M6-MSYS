@@ -19,7 +19,7 @@
             <div class="d-flex justify-content-center">
             {% if message == 'Account does not exist.' %}
                 <div class="alert alert-warning alert-dismissible fade show" style="position: fixed; z-index: 1; width: 50%;" role="alert">
-            {% elif message == 'Incorrect password.' %}
+            {% elif message == 'Incorrect password.' or message == 'Account deleted.' %}
                 <div class="alert alert-danger alert-dismissible fade show" style="position: fixed; z-index: 1; width: 50%;" role="alert">
             {% elif message == 'Account created successfully.' %}
                 <div class="alert alert-success alert-dismissible fade show" style="position: fixed; z-index: 1; width: 50%;" role="alert">
@@ -46,7 +46,11 @@
                             
                                 <div class="form-group">
                                     <label for="name"> Username: </label>
-                                    <input type="text" class="form-control" id="username" name="username" required>
+                                    {% if fusername %}
+                                        <input type="text" class="form-control" id="username" name="username" value="{{ fusername }}" required>
+                                    {% else %}
+                                        <input type="text" class="form-control" id="username" name="username" required>
+                                    {% endif %}
                                 </div>
                 
                                 <div class="row">

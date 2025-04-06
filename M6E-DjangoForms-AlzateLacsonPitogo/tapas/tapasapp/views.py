@@ -62,7 +62,8 @@ def manage_account(request, pk):
     
     else:
         user = get_object_or_404(Account, pk=pk)
-        return render(request, 'tapasapp/manage_account.html', {'user':user})
+        message = request.session.pop('message', None)
+        return render(request, 'tapasapp/manage_account.html', {'user':user, 'message':message})
     
 def change_password(request, pk):
     if(request.method=="POST"):
@@ -76,6 +77,7 @@ def change_password(request, pk):
             if new_password == new_password2:
                 if old_password == Account.objects.get(pk=pk).getPassword():
                     Account.objects.filter(pk=pk).update(password=new_password)
+                    request.session['message'] = 'Password changed successfully.'
                     return redirect('manage_account', pk=pk)
                 
                 else:
@@ -94,6 +96,7 @@ def change_password(request, pk):
 
 def delete_account(request, pk):
     Account.objects.filter(pk=pk).delete()
+    request.session['message'] = 'Account deleted.'
     return redirect('login')
 
 def login(request):
@@ -120,7 +123,8 @@ def login(request):
         
     else:
         message = request.session.pop('message', None)
-        return render(request, 'tapasapp/login.html', {'message':message})
+        fusername = request.session.pop('fresh_username', None)
+        return render(request, 'tapasapp/login.html', {'message':message, 'fusername':fusername})
         
 
 def signup(request):
@@ -135,6 +139,7 @@ def signup(request):
             if not username_exists:
                 Account.objects.create(username=username, password=password)
                 request.session['message'] = 'Account created successfully.'
+                request.session['fresh_username'] = username
                 return redirect('login')
             else:
                 return render(request, 'tapasapp/signup.html', {'message':'Username is already taken.'})
