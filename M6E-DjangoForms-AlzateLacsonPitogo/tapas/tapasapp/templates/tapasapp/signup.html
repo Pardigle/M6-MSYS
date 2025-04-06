@@ -2,9 +2,9 @@
 {% load static %}
 
 {% block alert %}
-    {% if error %}
+    {% if message %}
         <div class="alert alert-warning" role="alert">
-            {{ error }}
+            {{ message }}
         </div>
     {% endif %}
 {% endblock %}

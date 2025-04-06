@@ -2,11 +2,18 @@
 {% load static %}
 
 {% block alert %}
-    {% if error %}
-        <div class="alert alert-warning" role="alert">
-            {{ error }}
-        </div>
+{% if message %}
+    {% if message == 'Account does not exist.' %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    {% elif message == 'Incorrect password.' %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {% elif message == 'Account created successfully.' %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
     {% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+{% endif %}
 {% endblock %}
 
 {% block content %}

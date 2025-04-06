@@ -14,6 +14,7 @@ class Dish(models.Model):
 class Account(models.Model):
     username = models.CharField(max_length=300)
     password = models.CharField(max_length=300)
+    objects = models.Manager()
 
     def getUsername(self):
         return self.username

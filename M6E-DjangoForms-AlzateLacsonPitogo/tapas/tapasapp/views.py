@@ -48,9 +48,9 @@ def login(request):
                 if password == credentials.getPassword():
                     return redirect('better_menu')
                 else:
-                    return render(request, 'tapasapp/login.html', {'error': 'Incorrect password.'})
+                    return render(request, 'tapasapp/login.html', {'message': 'Incorrect password.'})
             else:
-                return render(request, 'tapasapp/login.html', {'error': 'Account does not exist.'})
+                return render(request, 'tapasapp/login.html', {'message': 'Account does not exist.'})
         
         elif button == "signup":
             return redirect('signup')
@@ -67,13 +67,13 @@ def signup(request):
         password = request.POST.get("password")
         
         if button == "signup":
-            check_username = len(Account.objects.filter(username=username))
+            check_username = Account.objects.filter(username=username)
 
-            if check_username == 0:
+            if check_username == None:
                 Account.objects.create(username=username, password=password)
-                return redirect('login')
+                return redirect('login', {'message':'Account created successfully.'})
             else:
-                return render(request, 'tapasapp/signup.html', {'error':'Username is already taken.'})
+                return render(request, 'tapasapp/signup.html', {'message':'Username is already taken.'})
             
         elif button == "login":
             return redirect('login')
