@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Dish, Account 
 
 # Create your views here.
-
+global message
+message = None
 
 def better_menu(request):
     dish_objects = Dish.objects.all()
@@ -43,7 +44,8 @@ def login(request):
         password = request.POST.get("password")
 
         if button == "login":
-            if Account.objects.filter(username=username).exists():
+            valid_account = Account.objects.filter(username=username).exists()
+            if valid_account:
                 credentials = Account.objects.get(username=username)
                 if password == credentials.getPassword():
                     return redirect('better_menu')
@@ -55,9 +57,9 @@ def login(request):
         elif button == "signup":
             return redirect('signup')
         
-
     else:
-        return render(request, 'tapasapp/login.html')
+        global message
+        return render(request, 'tapasapp/login.html', {'message':message})
         
 
 def signup(request):
@@ -67,11 +69,13 @@ def signup(request):
         password = request.POST.get("password")
         
         if button == "signup":
-            check_username = Account.objects.filter(username=username)
+            username_exists = Account.objects.filter(username=username).exists()
 
-            if check_username == None:
+            if not username_exists:
                 Account.objects.create(username=username, password=password)
-                return redirect('login', {'message':'Account created successfully.'})
+                global message
+                message = 'Account created successfully.'
+                return redirect('login')
             else:
                 return render(request, 'tapasapp/signup.html', {'message':'Username is already taken.'})
             
