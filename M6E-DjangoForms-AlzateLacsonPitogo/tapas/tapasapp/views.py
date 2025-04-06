@@ -3,7 +3,9 @@ from .models import Dish, Account
 
 # Create your views here.
 global message
+global current_user
 message = None
+current_user = None
 
 def better_menu(request):
     dish_objects = Dish.objects.all()
@@ -36,7 +38,61 @@ def update_dish(request, pk):
     else:
         d = get_object_or_404(Dish, pk=pk)
         return render(request, 'tapasapp/update_menu.html', {'d':d})
+
+def basic_list(request, pk):
+    dish_objects = Dish.objects.all()
+    user = get_object_or_404(Account, pk=pk)
+    return render(request, 'tapasapp/basic_list.html', {'dishes':dish_objects, 'user':user})
+
+def manage_account(request, pk):
+    if(request.method=="POST"):
+        button = request.POST.get("button")
+
+        if button == "change_password":
+            return redirect('change_password', pk=pk)
+
+        elif button == "delete_account":
+            return redirect('delete_account', pk=pk)
+
+        elif button == "back":
+            return redirect('basic_list', pk=pk)
     
+    else:
+        user = get_object_or_404(Account, pk=pk)
+        return render(request, 'tapasapp/manage_account.html', {'user':user})
+    
+def change_password(request, pk):
+    if(request.method=="POST"):
+        button = request.POST.get("button")
+
+        if button == "confirm":
+            old_password = request.POST.get('old_password')
+            new_password = request.POST.get('new_password')
+            new_password2 = request.POST.get('new_password2')
+
+            if new_password == new_password2:
+                if old_password == Account.objects.get(pk=pk).getPassword():
+                    Account.objects.filter(pk=pk).update(password=new_password)
+                    return redirect('manage_account', pk=pk)
+                
+                else:
+                    message = "Input correct old password. Try again."
+                    return render(request, 'tapasapp/change_password.html', {'message':message})
+            
+            else:
+                message = "Unmatching passwords. Try again."
+                return render(request, 'tapasapp/change_password.html', {'message':message})
+        
+        elif button == "cancel":
+            return redirect('manage_account', pk=pk)
+    
+    else:
+        return render(request, 'tapasapp/change_password.html')
+
+def delete_account(request, pk):
+    Account.objects.filter(pk=pk).delete()
+    return redirect('login')
+
 def login(request):
     if(request.method=="POST"):
         button = request.POST.get("button")
@@ -48,7 +104,9 @@ def login(request):
             if valid_account:
                 credentials = Account.objects.get(username=username)
                 if password == credentials.getPassword():
-                    return redirect('better_menu')
+                    global current_user
+                    current_user = credentials
+                    return redirect('basic_list', pk=current_user.pk)
                 else:
                     return render(request, 'tapasapp/login.html', {'message': 'Incorrect password.'})
             else:

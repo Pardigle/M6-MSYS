@@ -1,6 +1,12 @@
 {% extends 'tapasapp/base.html' %}
 {% load static %}
 
+    {% block manager %}
+        <div class="d-flex justify-content-end">
+            <a href="{% url 'manage_account' pk=user.pk %}"  class="btn btn-primary px-3 mr-3">Manage Account</a>
+            <a href="{% url 'log_out' pk=user.pk %}"  class="btn btn-danger">Log-out</a>
+        </div>
+    {% endblock %}
 
 
                 {% block content %}
