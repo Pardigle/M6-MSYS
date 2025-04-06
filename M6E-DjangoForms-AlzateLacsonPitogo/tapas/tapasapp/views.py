@@ -40,22 +40,25 @@ def update_dish(request, pk):
         return render(request, 'tapasapp/update_menu.html', {'d':d})
 
 def basic_list(request, pk):
-    dish_objects = Dish.objects.all()
-    user = get_object_or_404(Account, pk=pk)
-    return render(request, 'tapasapp/basic_list.html', {'dishes':dish_objects, 'user':user})
+    if(request.method=="POST"):
+        button = request.POST.get("button")
+
+        if button == "log_out":
+            global current_user
+            current_user = None
+            return redirect('login')
+
+    else:
+        dish_objects = Dish.objects.all()
+        user = get_object_or_404(Account, pk=pk)
+        return render(request, 'tapasapp/basic_list.html', {'dishes':dish_objects, 'user':user})
 
 def manage_account(request, pk):
     if(request.method=="POST"):
         button = request.POST.get("button")
 
-        if button == "change_password":
-            return redirect('change_password', pk=pk)
-
-        elif button == "delete_account":
+        if button == "delete_account":
             return redirect('delete_account', pk=pk)
-
-        elif button == "back":
-            return redirect('basic_list', pk=pk)
     
     else:
         user = get_object_or_404(Account, pk=pk)
