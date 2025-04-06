@@ -43,7 +43,7 @@ def basic_list(request, pk):
     if(request.method=="POST"):
         button = request.POST.get("button")
 
-        if button == "log_out":
+        if button == "logout":
             global current_user
             current_user = None
             return redirect('login')

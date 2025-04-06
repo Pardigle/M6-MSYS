@@ -3,8 +3,10 @@
 
     {% block manager %}
         <div class="d-flex justify-content-end">
-            <a href="{% url 'manage_account' pk=user.pk %}"  class="btn btn-primary px-3 mr-3">Manage Account</a>
-            <button name="log_out"  class="btn btn-danger">Log-out</button>
+            <form method="POST">{% csrf_token %}
+                <a href="{% url 'manage_account' pk=user.pk %}"  class="btn btn-primary px-3 mr-3">Manage Account</a>
+                <button name="button" value="logout" class="btn btn-danger">Log-out</button>
+            </form>
         </div>
     {% endblock %}
 
