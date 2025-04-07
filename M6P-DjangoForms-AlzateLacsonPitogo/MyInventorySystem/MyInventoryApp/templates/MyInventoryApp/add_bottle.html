@@ -1,0 +1,88 @@
+{% extends 'MyInventoryApp/base.html' %}
+{% load static %}
+
+{% block sidebar %}
+    <ul>
+        <li>
+            <a href="view_bottles" style="text-decoration: none; color: black;">View Bottles</a>
+        </li>
+        <li>
+            <a href="view_supplier" style="text-decoration: none; color: black;">View Suppliers</a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+<form>
+    <div class="card" style="max-width: 800px;">
+        <div class="card-header">
+            <h5>Type in Bottle Details</h5>
+        </div>
+        <div class="row px-3">
+            <div class="col-2 p-2">
+                <label>
+                    SKU:
+                </label>
+                <input type="text" class="form-control" maxlength="3">
+            </div>
+            <div class="col p-2">
+                <label>
+                    Brand:
+                </label>
+                <input type="text" class="form-control">
+            </div>
+        </div>
+        <div class="row px-3">
+            <div class="col p-2">
+                <label>
+                    Cost:
+                </label>
+                <input type="text" class="form-control">
+            </div>
+    
+            <div class="col p-2">
+                <label>
+                    Size:
+                </label>
+                <input type="text" class="form-control">
+            </div>
+        </div>
+        <div class="row px-3">
+            <div class="col p-2">
+                <label>
+                    Mouth Size:
+                </label>
+                <select class="form-control">
+                    <option value="" disabled selected>--</option>
+                    <option class="form-control">Standard Mouth</option>
+                    <option class="form-control">Wide Mouth</option>
+                </select>
+            </div>
+            <div class="col p-2">
+                <label>
+                    Color:
+                </label>
+                <input type="text" class="form-control">
+            </div>
+        </div>
+        <div class="col p-3">
+            <label>
+                Supplier:
+            </label>
+            <select class="form-control">
+                <option value="" disabled selected>--</option>
+                {% for i in supplier %}
+                    <option> {{ i.name }} </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="p-3 pb-5">
+            <button class="btn btn-primary">
+                Submit
+            </button>
+        </div>
+
+    </div>
+</form>
+{% endblock %}

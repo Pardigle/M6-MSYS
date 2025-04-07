@@ -1,0 +1,46 @@
+{% extends 'MyInventoryApp/base.html' %}
+{% load static %}
+
+    {% block sidebar %}
+        <ul>
+            <li>
+                <a href="view_bottles" style="text-decoration: none; color: black;">View Bottles</a>
+            </li>
+            <li>
+                <a href="view_supplier" style="text-decoration: none; color: black;">View Suppliers</a>
+            </li>
+        </ul>
+    {% endblock %}
+
+                {% block content %}
+                <div class="col-12">
+                    <table class="table table-striped">
+                        <thead >
+                            <tr>
+                                <th scope="col"> SKU </th>
+                                <th scope="col"> Brand </th>
+                                <th scope="col"> Cost </th>
+                                <th scope="col"> Size </th>
+                                <th scope="col"> Mouth Size </th>
+                                <th scope="col"> Color </th>
+                                <th scope="col"> Supplier </th>  
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in bottles %}
+                            <tr>
+                                <td> {{ b.sku }} </td>
+                                <td> {{ b.brand }} </td>
+                                <td> {{ b.cost }} </td>
+                                <td> {{ b.size }} </td>
+                                <td> {{ b.mouth_size}} </td>
+                                <td> {{ b.color }} </td>
+                                <td> {{ b.supplier.name}} </td>
+                                <td> <button class="btn btn-dark">Details</button> </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endblock %}

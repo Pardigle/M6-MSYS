@@ -1,0 +1,38 @@
+{% load static %}
+
+<html>
+    <head>
+        <title>My Inventory System</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+        <link rel="stylesheet" href="{% static '/bootstrap/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="{% static '/bootstrap/css/custom.css' %}">
+        <script src="{% static '/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    </head>
+    
+    <body>
+        <nav class="navbar navbar-dark bg-custom mb-3 sticky-top" style="background-color: #15a0a2;">
+            <div class="container-fluid">
+                <a class="navbar-brand mb-0" href="{% url 'view_bottles' %}">My Inventory System</span> </a>
+                <a href="add_bottle" style="color:white"><i class="material-icons">add</i></a>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-2">
+                    {% block sidebar %}
+                    {% endblock %}
+                </div>
+                <div class="col-10">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>  
+    </body>
+    <footer class="footer bg-custom" style="background-color: #15a0a2; position: fixed;">
+        <!-- Copyright -->
+        <div class="container">&copy; 2025</div>
+        <!-- Copyright -->
+    </footer>
+</html>
