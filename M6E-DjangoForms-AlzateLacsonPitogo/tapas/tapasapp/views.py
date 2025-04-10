@@ -11,7 +11,7 @@ def better_menu(request):
     global current_user
     if current_user:
         dish_objects = Dish.objects.all()
-        return render(request, 'tapasapp/better_list.html', {'dishes':dish_objects})
+        return render(request, 'tapasapp/better_list.html', {'dishes':dish_objects, 'user':current_user})
     else:
         return redirect('login')
 
@@ -25,7 +25,7 @@ def add_menu(request):
             Dish.objects.create(name=dishname, cook_time=cooktime, prep_time=preptime)
             return redirect('better_menu')
         else:
-            return render(request, 'tapasapp/add_menu.html')
+            return render(request, 'tapasapp/add_menu.html', {'user':current_user})
     else:
         return redirect('login')
 
@@ -33,7 +33,7 @@ def view_detail(request, pk):
     global current_user
     if current_user:
         d = get_object_or_404(Dish, pk=pk)
-        return render(request, 'tapasapp/view_detail.html', {'d': d})
+        return render(request, 'tapasapp/view_detail.html', {'d': d, 'user':current_user})
     else:
         return redirect('login')
 
@@ -51,7 +51,7 @@ def update_dish(request, pk):
             return redirect('view_detail', pk=pk)
         else:
             d = get_object_or_404(Dish, pk=pk)
-            return render(request, 'tapasapp/update_menu.html', {'d':d})
+            return render(request, 'tapasapp/update_menu.html', {'d':d, 'user':current_user})
     else:
         return redirect('login')
 
@@ -67,8 +67,7 @@ def basic_list(request, pk):
 
         else:
             dish_objects = Dish.objects.all()
-            user = get_object_or_404(Account, pk=pk)
-            return render(request, 'tapasapp/basic_list.html', {'dishes':dish_objects, 'user':user})
+            return render(request, 'tapasapp/basic_list.html', {'dishes':dish_objects, 'user':current_user})
     else:
         return redirect('login')
 
@@ -107,17 +106,17 @@ def change_password(request, pk):
                     
                     else:
                         message = "Input correct old password. Try again."
-                        return render(request, 'tapasapp/change_password.html', {'message':message})
+                        return render(request, 'tapasapp/change_password.html', {'message':message, 'user':current_user})
                 
                 else:
                     message = "Unmatching passwords. Try again."
-                    return render(request, 'tapasapp/change_password.html', {'message':message})
+                    return render(request, 'tapasapp/change_password.html', {'message':message, 'user':current_user})
             
             elif button == "cancel":
                 return redirect('manage_account', pk=pk)
         
         else:
-            return render(request, 'tapasapp/change_password.html')
+            return render(request, 'tapasapp/change_password.html', {'user':current_user})
     else:
         return redirect('login')
 
