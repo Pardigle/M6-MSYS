@@ -2,97 +2,124 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Dish, Account 
 
 # Create your views here.
-global message
 global current_user
+global message
 message = None
 current_user = None
 
 def better_menu(request):
-    dish_objects = Dish.objects.all()
-    return render(request, 'tapasapp/better_list.html', {'dishes':dish_objects})
+    global current_user
+    if current_user:
+        dish_objects = Dish.objects.all()
+        return render(request, 'tapasapp/better_list.html', {'dishes':dish_objects})
+    else:
+        return redirect('login')
 
 def add_menu(request):
-    if(request.method=="POST"):
-        dishname = request.POST.get('dname')
-        cooktime = request.POST.get('ctime')
-        preptime = request.POST.get('ptime')
-        Dish.objects.create(name=dishname, cook_time=cooktime, prep_time=preptime)
-        return redirect('better_menu')
+    global current_user
+    if current_user:
+        if(request.method=="POST"):
+            dishname = request.POST.get('dname')
+            cooktime = request.POST.get('ctime')
+            preptime = request.POST.get('ptime')
+            Dish.objects.create(name=dishname, cook_time=cooktime, prep_time=preptime)
+            return redirect('better_menu')
+        else:
+            return render(request, 'tapasapp/add_menu.html')
     else:
-        return render(request, 'tapasapp/add_menu.html')
+        return redirect('login')
 
 def view_detail(request, pk):
-    d = get_object_or_404(Dish, pk=pk)
-    return render(request, 'tapasapp/view_detail.html', {'d': d})
+    global current_user
+    if current_user:
+        d = get_object_or_404(Dish, pk=pk)
+        return render(request, 'tapasapp/view_detail.html', {'d': d})
+    else:
+        return redirect('login')
 
 def delete_dish(request, pk):
     Dish.objects.filter(pk=pk).delete()
     return redirect('better_menu')
 
 def update_dish(request, pk):
-    if(request.method=="POST"):
-        cooktime = request.POST.get('ctime')
-        preptime = request.POST.get('ptime')
-        Dish.objects.filter(pk=pk).update(cook_time=cooktime, prep_time=preptime)
-        return redirect('view_detail', pk=pk)
+    global current_user
+    if current_user:
+        if(request.method=="POST"):
+            cooktime = request.POST.get('ctime')
+            preptime = request.POST.get('ptime')
+            Dish.objects.filter(pk=pk).update(cook_time=cooktime, prep_time=preptime)
+            return redirect('view_detail', pk=pk)
+        else:
+            d = get_object_or_404(Dish, pk=pk)
+            return render(request, 'tapasapp/update_menu.html', {'d':d})
     else:
-        d = get_object_or_404(Dish, pk=pk)
-        return render(request, 'tapasapp/update_menu.html', {'d':d})
+        return redirect('login')
 
 def basic_list(request, pk):
-    if(request.method=="POST"):
-        button = request.POST.get("button")
+    global current_user
+    if current_user:
+        if(request.method=="POST"):
+            button = request.POST.get("button")
 
-        if button == "logout":
-            global current_user
-            current_user = None
-            return redirect('login')
+            if button == "logout":
+                current_user = None
+                return redirect('login')
 
+        else:
+            dish_objects = Dish.objects.all()
+            user = get_object_or_404(Account, pk=pk)
+            return render(request, 'tapasapp/basic_list.html', {'dishes':dish_objects, 'user':user})
     else:
-        dish_objects = Dish.objects.all()
-        user = get_object_or_404(Account, pk=pk)
-        return render(request, 'tapasapp/basic_list.html', {'dishes':dish_objects, 'user':user})
+        return redirect('login')
 
 def manage_account(request, pk):
-    if(request.method=="POST"):
-        button = request.POST.get("button")
+    global current_user
+    if current_user:
+        if(request.method=="POST"):
+            button = request.POST.get("button")
 
-        if button == "delete_account":
-            return redirect('delete_account', pk=pk)
-    
+            if button == "delete_account":
+                return redirect('delete_account', pk=pk)
+        
+        else:
+            user = get_object_or_404(Account, pk=pk)
+            message = request.session.pop('message', None)
+            return render(request, 'tapasapp/manage_account.html', {'user':user, 'message':message})
     else:
-        user = get_object_or_404(Account, pk=pk)
-        message = request.session.pop('message', None)
-        return render(request, 'tapasapp/manage_account.html', {'user':user, 'message':message})
+        return redirect('login')
     
 def change_password(request, pk):
-    if(request.method=="POST"):
-        button = request.POST.get("button")
+    global current_user
+    if current_user:
+        if(request.method=="POST"):
+            button = request.POST.get("button")
 
-        if button == "confirm":
-            old_password = request.POST.get('old_password')
-            new_password = request.POST.get('new_password')
-            new_password2 = request.POST.get('new_password2')
+            if button == "confirm":
+                old_password = request.POST.get('old_password')
+                new_password = request.POST.get('new_password')
+                new_password2 = request.POST.get('new_password2')
 
-            if new_password == new_password2:
-                if old_password == Account.objects.get(pk=pk).getPassword():
-                    Account.objects.filter(pk=pk).update(password=new_password)
-                    request.session['message'] = 'Password changed successfully.'
-                    return redirect('manage_account', pk=pk)
+                if new_password == new_password2:
+                    if old_password == get_object_or_404(Account, pk=pk).getPassword():
+                        Account.objects.filter(pk=pk).update(password=new_password)
+                        request.session['message'] = 'Password changed successfully.'
+                        return redirect('manage_account', pk=pk)
+                    
+                    else:
+                        message = "Input correct old password. Try again."
+                        return render(request, 'tapasapp/change_password.html', {'message':message})
                 
                 else:
-                    message = "Input correct old password. Try again."
+                    message = "Unmatching passwords. Try again."
                     return render(request, 'tapasapp/change_password.html', {'message':message})
             
-            else:
-                message = "Unmatching passwords. Try again."
-                return render(request, 'tapasapp/change_password.html', {'message':message})
+            elif button == "cancel":
+                return redirect('manage_account', pk=pk)
         
-        elif button == "cancel":
-            return redirect('manage_account', pk=pk)
-    
+        else:
+            return render(request, 'tapasapp/change_password.html')
     else:
-        return render(request, 'tapasapp/change_password.html')
+        return redirect('login')
 
 def delete_account(request, pk):
     Account.objects.filter(pk=pk).delete()
