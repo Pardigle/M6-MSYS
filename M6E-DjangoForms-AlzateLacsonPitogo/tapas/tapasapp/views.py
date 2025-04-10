@@ -168,7 +168,10 @@ def signup(request):
                 request.session['fresh_username'] = username
                 return redirect('login')
             else:
-                return render(request, 'tapasapp/signup.html', {'message':'Username is already taken.'})
+                return render(request, 'tapasapp/signup.html', {
+                    'message': 'Username is already taken.',
+                    'username': username
+                })
         
     else:
-        return render(request, 'tapasapp/signup.html')
+        return render(request, 'tapasapp/signup.html', { 'username': '' })
