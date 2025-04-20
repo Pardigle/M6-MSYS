@@ -47,13 +47,37 @@ def signup(request):
         return render(request, 'MyInventoryApp/signup.html')
 
 def view_bottles(request):
-    bottle_objects = WaterBottle.objects.all()
-    return render(request, 'MyInventoryApp/view_bottles.html', {'bottles':bottle_objects})
+    global current_user
+    if current_user:
+        bottle_objects = WaterBottle.objects.all()
+        return render(request, 'MyInventoryApp/view_bottles.html', {'bottles':bottle_objects})
+    else:
+        return redirect('login')
 
 def view_supplier(request):
-    supplier_objects = Supplier.objects.all()
-    return render(request, 'MyInventoryApp/view_supplier.html', {'supplier':supplier_objects})
+    global current_user
+    if current_user:
+        supplier_objects = Supplier.objects.all()
+        return render(request, 'MyInventoryApp/view_supplier.html', {'supplier':supplier_objects})
+    else:
+        return redirect('login')
 
 def add_bottle(request):
-    supplier_objects = Supplier.objects.all()
-    return render(request, 'MyInventoryApp/add_bottle.html', {'supplier':supplier_objects})
+    global current_user
+    if current_user:
+        supplier_objects = Supplier.objects.all()
+        return render(request, 'MyInventoryApp/add_bottle.html', {'supplier':supplier_objects})
+    else:
+        return redirect('login')
+    
+'''
+Put this so that the log-in is required for every view.
+
+
+    global current_user
+    if current_user:
+        <Your code>
+    else:
+        return redirect('login')
+
+'''
