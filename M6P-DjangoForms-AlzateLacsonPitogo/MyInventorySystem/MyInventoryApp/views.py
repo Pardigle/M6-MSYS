@@ -90,9 +90,6 @@ def view_supplier(request):
     else:
         return redirect('login')
 
-from django.shortcuts import render, redirect
-from .models import Supplier, WaterBottle
-
 def add_bottle(request):
     if request.method == 'POST':
 
