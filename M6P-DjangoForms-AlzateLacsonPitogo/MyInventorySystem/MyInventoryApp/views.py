@@ -88,7 +88,11 @@ def add_bottle(request):
         return render(request, 'MyInventoryApp/add_bottle.html', {'supplier':supplier_objects})
     else:
         return redirect('login')
-    
+
+def logout_view(request):
+    request.session.flush()
+    return redirect('login')
+
 '''
 Put this so that the log-in is required for every view.
 
