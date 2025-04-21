@@ -46,22 +46,26 @@ def signup(request):
     else:
         return render(request, 'MyInventoryApp/signup.html')
 
-def view_bottles(request, supplier_id):
-    global current_user
-    if current_user:
-        supplier = get_object_or_404(Supplier, id=supplier_id)
-        bottle_objects = WaterBottle.objects.filter(supplier=supplier)
-        return render(request, 'MyInventoryApp/view_bottles.html', {'bottles': bottle_objects, 'supplier': supplier})
-    else:
-        return redirect('login')
+def view_bottles(request):
+    # Show all bottles in the system
+    bottles = WaterBottle.objects.all()
+    return render(request, 'MyInventoryApp/view_bottles.html', {
+        'bottles': bottles
+    })
 
 def view_bottle_details(request, pk):
-    global current_user
-    if current_user:
-        bottle = get_object_or_404(WaterBottle, id=pk)
-        return render(request, 'MyInventoryApp/view_bottle_details.html', {'bottle': bottle})
-    else:
-        return redirect('login')
+    bottle = get_object_or_404(WaterBottle, pk=pk)
+
+    # Handle the Delete button
+    if request.method == "POST" and "delete" in request.POST:
+        bottle.delete()
+        return redirect("view_bottles")
+
+    # Otherwise just render the details page
+    return render(request, "MyInventoryApp/view_bottle_details.html", {
+        "bottle": bottle
+    })
+
 
 def delete_bottle(request, bottle_id):
     global current_user
@@ -88,7 +92,7 @@ def add_bottle(request):
         return render(request, 'MyInventoryApp/add_bottle.html', {'supplier':supplier_objects})
     else:
         return redirect('login')
-
+    
 def logout_view(request):
     request.session.flush()
     return redirect('login')
