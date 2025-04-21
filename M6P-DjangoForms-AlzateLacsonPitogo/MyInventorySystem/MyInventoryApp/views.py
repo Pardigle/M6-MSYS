@@ -91,10 +91,28 @@ def view_supplier(request):
         return redirect('login')
 
 def add_bottle(request):
-    global current_user
-    if current_user:
+    if current_user:  # Check if current_user is set
+        if request.method == 'POST':
+            sku = request.POST.get('sku')
+            brand = request.POST.get('brand')
+            cost = request.POST.get('cost')
+            size = request.POST.get('size')
+            mouth_size = request.POST.get('mouth_size')
+            color = request.POST.get('color')
+            supplier_id = request.POST.get('supplier')
+            supplier = Supplier.objects.get(id=supplier_id)
+            quantity = request.POST.get('quantity')
+            
+            WaterBottle.objects.create(
+                sku=sku, brand=brand, cost=cost, size=size,
+                mouth_size=mouth_size, color=color,
+                supplier=supplier, current_quantity=quantity
+            )
+            return redirect('view_bottles')
+        
         supplier_objects = Supplier.objects.all()
-        return render(request, 'MyInventoryApp/add_bottle.html', {'supplier':supplier_objects})
+        return render(request, 'MyInventoryApp/add_bottle.html', {'supplier': supplier_objects})
+    
     else:
         return redirect('login')
     
@@ -155,4 +173,3 @@ def delete_account(request, pk):
     Account.objects.filter(pk=pk).delete()
     request.session['message'] = 'Account deleted.'
     return redirect('login')
-
