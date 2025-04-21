@@ -27,4 +27,5 @@ urlpatterns = [
     path("view_bottle_details/<int:pk>/", views.view_bottle_details, name="view_bottle_details"),
     path("view_supplier", views.view_supplier, name="view_supplier"),
     path("add_bottle", views.add_bottle, name="add_bottle"),
+    path("logout/", views.logout_view, name="logout"),
     ]
