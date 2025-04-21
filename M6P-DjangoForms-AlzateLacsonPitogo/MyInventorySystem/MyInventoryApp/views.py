@@ -3,6 +3,9 @@ from .models import WaterBottle, Supplier, Account
 
 # Create your views here.
 
+global current_user
+current_user = None
+
 def login(request):
     if(request.method=="POST"):
         button = request.POST.get("button")
@@ -47,24 +50,30 @@ def signup(request):
         return render(request, 'MyInventoryApp/signup.html')
 
 def view_bottles(request):
-    # Show all bottles in the system
-    bottles = WaterBottle.objects.all()
-    return render(request, 'MyInventoryApp/view_bottles.html', {
-        'bottles': bottles
-    })
+    global current_user
+    if current_user:
+        # Show all bottles in the system
+        bottles = WaterBottle.objects.all()
+        return render(request, 'MyInventoryApp/view_bottles.html', {
+            'bottles': bottles
+        })
+    else:
+        return redirect('login')
 
 def view_bottle_details(request, pk):
-    bottle = get_object_or_404(WaterBottle, pk=pk)
+    global current_user
+    if current_user:
+        bottle = get_object_or_404(WaterBottle, pk=pk)
 
-    # Handle the Delete button
-    if request.method == "POST" and "delete" in request.POST:
-        bottle.delete()
-        return redirect("view_bottles")
+        # Handle the Delete button
+        if request.method == "POST" and "delete" in request.POST:
+            bottle.delete()
+            return redirect("view_bottles")
 
-    # Otherwise just render the details page
-    return render(request, "MyInventoryApp/view_bottle_details.html", {
-        "bottle": bottle
-    })
+        # Otherwise just render the details page
+        return render(request, "MyInventoryApp/view_bottle_details.html", {"bottle": bottle})
+    else:
+        return redirect('login')
 
 
 def delete_bottle(request, bottle_id):
@@ -94,6 +103,8 @@ def add_bottle(request):
         return redirect('login')
     
 def logout_view(request):
+    global current_user
+    current_user = None
     request.session.flush()
     return redirect('login')
 
