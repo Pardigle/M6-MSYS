@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import WaterBottle, Supplier, Account
 
 # Create your views here.
-
 global current_user
+global message
+message = None
 current_user = None
 
 def login(request):
@@ -18,6 +19,7 @@ def login(request):
                 credentials = Account.objects.get(username=username)
                 if password == credentials.getPassword():
                     global current_user
+                    request.session['account_id'] = credentials.pk
                     current_user = credentials
                     return redirect('view_supplier')
                 else:
@@ -50,30 +52,24 @@ def signup(request):
         return render(request, 'MyInventoryApp/signup.html')
 
 def view_bottles(request):
-    global current_user
-    if current_user:
-        # Show all bottles in the system
-        bottles = WaterBottle.objects.all()
-        return render(request, 'MyInventoryApp/view_bottles.html', {
-            'bottles': bottles
-        })
-    else:
-        return redirect('login')
+    # Show all bottles in the system
+    bottles = WaterBottle.objects.all()
+    return render(request, 'MyInventoryApp/view_bottles.html', {
+        'bottles': bottles
+    })
 
 def view_bottle_details(request, pk):
-    global current_user
-    if current_user:
-        bottle = get_object_or_404(WaterBottle, pk=pk)
+    bottle = get_object_or_404(WaterBottle, pk=pk)
 
-        # Handle the Delete button
-        if request.method == "POST" and "delete" in request.POST:
-            bottle.delete()
-            return redirect("view_bottles")
+    # Handle the Delete button
+    if request.method == "POST" and "delete" in request.POST:
+        bottle.delete()
+        return redirect("view_bottles")
 
-        # Otherwise just render the details page
-        return render(request, "MyInventoryApp/view_bottle_details.html", {"bottle": bottle})
-    else:
-        return redirect('login')
+    # Otherwise just render the details page
+    return render(request, "MyInventoryApp/view_bottle_details.html", {
+        "bottle": bottle
+    })
 
 
 def delete_bottle(request, bottle_id):
@@ -103,19 +99,60 @@ def add_bottle(request):
         return redirect('login')
     
 def logout_view(request):
-    global current_user
-    current_user = None
     request.session.flush()
     return redirect('login')
 
-'''
-Put this so that the log-in is required for every view.
-
-
+def change_password(request, pk):
     global current_user
     if current_user:
-        <Your code>
+        if(request.method=="POST"):
+            button = request.POST.get("button")
+
+            if button == "confirm":
+                old_password = request.POST.get('old_password')
+                new_password = request.POST.get('new_password')
+                new_password2 = request.POST.get('new_password2')
+
+                if new_password == new_password2:
+                    if old_password == get_object_or_404(Account, pk=pk).getPassword():
+                        Account.objects.filter(pk=pk).update(password=new_password)
+                        request.session['message'] = 'Password changed successfully.'
+                        return redirect('manage_account', pk=pk)
+                    
+                    else:
+                        message = "Input correct old password. Try again."
+                        return render(request, 'MyInventoryApp/change_password.html', {'message':message, 'user':current_user})
+                
+                else:
+                    message = "Unmatching passwords. Try again."
+                    return render(request, 'MyInventoryApp/change_password.html', {'message':message, 'user':current_user})
+            
+            elif button == "cancel":
+                return redirect('manage_account', pk=pk)
+        
+        else:
+            return render(request, 'MyInventoryApp/change_password.html', {'user':current_user})
+    else:
+        return redirect('login')
+    
+def manage_account(request, pk):
+    global current_user
+    if current_user:
+        if(request.method=="POST"):
+            button = request.POST.get("button")
+
+            if button == "delete_account":
+                return redirect('delete_account', pk=pk)
+        
+        else:
+            user = get_object_or_404(Account, pk=pk)
+            message = request.session.pop('message', None)
+            return render(request, 'MyInventoryApp/manage_account.html', {'user':user, 'message':message})
     else:
         return redirect('login')
 
-'''
+def delete_account(request, pk):
+    Account.objects.filter(pk=pk).delete()
+    request.session['message'] = 'Account deleted.'
+    return redirect('login')
+
