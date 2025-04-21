@@ -141,7 +141,7 @@ def logout_view(request):
 def change_password(request, pk):
     global current_user
     if current_user:
-        if(request.method=="POST"):
+        if request.method == "POST":
             button = request.POST.get("button")
 
             if button == "confirm":
@@ -149,27 +149,34 @@ def change_password(request, pk):
                 new_password = request.POST.get('new_password')
                 new_password2 = request.POST.get('new_password2')
 
+                if not old_password or not new_password or not new_password2:
+                    return render(request, 'MyInventoryApp/change_password.html', {'user': current_user, 'message': 'Please fill up ALL fields before submitting'})
+
                 if new_password == new_password2:
                     if old_password == get_object_or_404(Account, pk=pk).getPassword():
                         Account.objects.filter(pk=pk).update(password=new_password)
+
                         request.session['message'] = 'Password changed successfully.'
+
                         return redirect('manage_account', pk=pk)
-                    
+
                     else:
                         message = "Input correct old password. Try again."
-                        return render(request, 'MyInventoryApp/change_password.html', {'message':message, 'user':current_user})
-                
+                        return render(request, 'MyInventoryApp/change_password.html', {'message': message, 'user': current_user})
+
                 else:
                     message = "Unmatching passwords. Try again."
-                    return render(request, 'MyInventoryApp/change_password.html', {'message':message, 'user':current_user})
-            
+                    return render(request, 'MyInventoryApp/change_password.html', {'message': message, 'user': current_user})
+
             elif button == "cancel":
                 return redirect('manage_account', pk=pk)
         
         else:
-            return render(request, 'MyInventoryApp/change_password.html', {'user':current_user})
+            return render(request, 'MyInventoryApp/change_password.html', {'user': current_user})
     else:
         return redirect('login')
+
+
     
 def manage_account(request, pk):
     global current_user
@@ -183,6 +190,7 @@ def manage_account(request, pk):
         else:
             user = get_object_or_404(Account, pk=pk)
             message = request.session.pop('message', None)
+            print(f"Message popped from session: {message}") 
             return render(request, 'MyInventoryApp/manage_account.html', {'user':user, 'message':message})
     else:
         return redirect('login')
@@ -203,4 +211,5 @@ Put this so that the log-in is required for every view.
         return redirect('login')
 
 '''
+
 
