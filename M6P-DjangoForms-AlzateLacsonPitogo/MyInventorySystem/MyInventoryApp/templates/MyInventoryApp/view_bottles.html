@@ -4,10 +4,10 @@
     {% block sidebar %}
         <ul>
             <li>
-                <a href="view_bottles" style="text-decoration: none; color: black;">View Bottles</a>
+                <a href="{% url 'view_bottles' %}" style="text-decoration: none; color: black;">View Bottles</a>
             </li>
             <li>
-                <a href="view_supplier" style="text-decoration: none; color: black;">View Suppliers</a>
+                <a href="{% url 'view_supplier' %}" style="text-decoration: none; color: black;">View Suppliers</a>
             </li>
         </ul>
     {% endblock %}
