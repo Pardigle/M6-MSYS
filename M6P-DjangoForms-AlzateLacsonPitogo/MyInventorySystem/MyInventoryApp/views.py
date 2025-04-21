@@ -46,11 +46,30 @@ def signup(request):
     else:
         return render(request, 'MyInventoryApp/signup.html')
 
-def view_bottles(request):
+def view_bottles(request, supplier_id):
     global current_user
     if current_user:
-        bottle_objects = WaterBottle.objects.all()
-        return render(request, 'MyInventoryApp/view_bottles.html', {'bottles':bottle_objects})
+        supplier = get_object_or_404(Supplier, id=supplier_id)
+        bottle_objects = WaterBottle.objects.filter(supplier=supplier)
+        return render(request, 'MyInventoryApp/view_bottles.html', {'bottles': bottle_objects, 'supplier': supplier})
+    else:
+        return redirect('login')
+
+def view_bottle_details(request, pk):
+    global current_user
+    if current_user:
+        bottle = get_object_or_404(WaterBottle, id=pk)
+        return render(request, 'MyInventoryApp/view_bottle_details.html', {'bottle': bottle})
+    else:
+        return redirect('login')
+
+def delete_bottle(request, bottle_id):
+    global current_user
+    if current_user:
+        bottle = get_object_or_404(WaterBottle, id=bottle_id)
+        supplier_id = bottle.supplier.id
+        bottle.delete()
+        return redirect('view_bottles', supplier_id=supplier_id)
     else:
         return redirect('login')
 
