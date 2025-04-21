@@ -37,10 +37,14 @@
                                 <td> {{ b.mouth_size}} </td>
                                 <td> {{ b.color }} </td>
                                 <td> {{ b.supplier.name}} </td>
-                                <td> <button class="btn btn-dark">Details</button> </td>
+                                <td>
+                                  <a href="{% url 'view_bottle_details' b.id %}" class="btn btn-dark">Details</a>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
+
+                    <a href="{% url 'view_supplier' %}" class="btn btn-secondary mt-3">Back to Suppliers</a>
                 </div>
                 {% endblock %}
