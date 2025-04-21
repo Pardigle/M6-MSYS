@@ -11,9 +11,13 @@
   <p><strong>Color:</strong> {{ bottle.color }}</p>
   <p><strong>Supplier:</strong> {{ bottle.supplier.name }}</p>
 
-  <form method="POST" action="{% url 'delete_bottle' bottle.id %}">
+  <form method="post">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a href="{% url 'view_bottles' bottle.supplier.id %}" class="btn btn-secondary">Back</a>
+    <button type="submit" name="delete" class="btn btn-danger">
+      Delete
+    </button>
+    <a href="{% url 'view_bottles' %}" class="btn btn-secondary">
+      Back
+    </a>
   </form>
 {% endblock %}
