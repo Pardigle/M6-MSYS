@@ -30,9 +30,9 @@
                                 <td> {{ s.name }} </td>
                                 <td> {{ s.city }} </td>
                                 <td> {{ s.country }} </td>
-
-                                
-                                <td> <button class="btn btn-dark">Details</button> </td>
+                                <td>
+                                  <a href="{% url 'view_bottles' s.id %}" class="btn btn-dark">View Bottles</a>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
