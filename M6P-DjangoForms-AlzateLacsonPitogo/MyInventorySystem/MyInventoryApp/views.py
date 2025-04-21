@@ -90,31 +90,52 @@ def view_supplier(request):
     else:
         return redirect('login')
 
+from django.shortcuts import render, redirect
+from .models import Supplier, WaterBottle
+
 def add_bottle(request):
-    if current_user: 
-        if request.method == 'POST':
-            sku = request.POST.get('sku')
-            brand = request.POST.get('brand')
-            cost = request.POST.get('cost')
-            size = request.POST.get('size')
-            mouth_size = request.POST.get('mouth_size')
-            color = request.POST.get('color')
-            supplier_id = request.POST.get('supplier')
+    if request.method == 'POST':
+
+        sku = request.POST.get('sku')
+        brand = request.POST.get('brand')
+        cost = request.POST.get('cost')
+        size = request.POST.get('size')
+        mouth_size = request.POST.get('mouth_size')
+        color = request.POST.get('color')
+        quantity = request.POST.get('quantity')
+        supplier_id = request.POST.get('supplier')
+
+        if not all([sku, brand, cost, size, mouth_size, color, quantity, supplier_id]):
+            return render(request, 'MyInventoryApp/add_bottle.html', {
+                'supplier': Supplier.objects.all(),
+                'message': 'Please fill out all fields before confirming.'
+            })
+
+        try:
             supplier = Supplier.objects.get(id=supplier_id)
-            quantity = request.POST.get('quantity')
-            
-            WaterBottle.objects.create(
-                sku=sku, brand=brand, cost=cost, size=size,
-                mouth_size=mouth_size, color=color,
-                supplier=supplier, current_quantity=quantity
-            )
-            return redirect('view_bottles')
-        
-        supplier_objects = Supplier.objects.all()
-        return render(request, 'MyInventoryApp/add_bottle.html', {'supplier': supplier_objects})
-    
-    else:
-        return redirect('login')
+        except Supplier.DoesNotExist:
+            return render(request, 'MyInventoryApp/add_bottle.html', {
+                'supplier': Supplier.objects.all(),
+                'message': 'Selected supplier does not exist.'
+            })
+
+        WaterBottle.objects.create(
+            sku=sku,
+            brand=brand,
+            cost=cost,
+            size=size,
+            mouth_size=mouth_size,
+            color=color,
+            supplier=supplier,
+            current_quantity=quantity
+        )
+
+        return redirect('view_bottles')
+
+    return render(request, 'MyInventoryApp/add_bottle.html', {
+        'supplier': Supplier.objects.all()
+    })
+
     
 def logout_view(request):
     request.session.flush()
@@ -173,3 +194,16 @@ def delete_account(request, pk):
     Account.objects.filter(pk=pk).delete()
     request.session['message'] = 'Account deleted.'
     return redirect('login')
+
+'''
+Put this so that the log-in is required for every view.
+
+
+    global current_user
+    if current_user:
+        <Your code>
+    else:
+        return redirect('login')
+
+'''
+
