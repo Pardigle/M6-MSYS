@@ -28,4 +28,7 @@ urlpatterns = [
     path("view_supplier", views.view_supplier, name="view_supplier"),
     path("add_bottle", views.add_bottle, name="add_bottle"),
     path("logout/", views.logout_view, name="logout"),
+    path("manage_account/<int:pk>/", views.manage_account, name="manage_account"),
+    path("change_password/<int:pk>", views.change_password, name="change_password"),
+    path("delete_account/<int:pk>/", views.delete_account, name="delete_account"),
     ]
