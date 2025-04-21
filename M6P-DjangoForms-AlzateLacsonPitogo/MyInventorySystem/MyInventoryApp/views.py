@@ -91,7 +91,7 @@ def view_supplier(request):
         return redirect('login')
 
 def add_bottle(request):
-    if current_user:  # Check if current_user is set
+    if current_user: 
         if request.method == 'POST':
             sku = request.POST.get('sku')
             brand = request.POST.get('brand')
