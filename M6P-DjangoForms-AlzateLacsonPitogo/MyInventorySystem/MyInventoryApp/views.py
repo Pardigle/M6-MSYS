@@ -75,7 +75,8 @@ def view_bottle_details(request, pk):
 
         # Otherwise just render the details page
         return render(request, "MyInventoryApp/view_bottle_details.html", {
-            "bottle": bottle
+            "bottle": bottle,
+            "user":current_user
         })
     else:
         return redirect('login')
