@@ -117,13 +117,15 @@ def add_bottle(request):
             if not all([sku, brand, cost, size, mouth_size, color, quantity, supplier_id]):
                 return render(request, 'MyInventoryApp/add_bottle.html', {
                     'supplier': Supplier.objects.all(),
-                    'message': 'Please fill out all fields before confirming.'
+                    'message': 'Please fill out all fields before confirming.',
+                    "user":current_user
                 })
 
             if WaterBottle.objects.filter(sku=sku).exists():
                     return render(request, 'MyInventoryApp/add_bottle.html', {
                         'supplier': Supplier.objects.all(),
-                        'message': 'A bottle with this SKU already exists.'
+                        'message': 'A bottle with this SKU already exists.',
+                        'user':current_user
                     })
                 
             try:
@@ -131,7 +133,8 @@ def add_bottle(request):
             except Supplier.DoesNotExist:
                 return render(request, 'MyInventoryApp/add_bottle.html', {
                     'supplier': Supplier.objects.all(),
-                    'message': 'Selected supplier does not exist.'
+                    'message': 'Selected supplier does not exist.',
+                    'user':current_user
                 })
 
             WaterBottle.objects.create(
@@ -216,6 +219,8 @@ def manage_account(request, pk):
         return redirect('login')
 
 def delete_account(request, pk):
+    global current_user
+    current_user = None
     Account.objects.filter(pk=pk).delete()
     request.session['message'] = 'Account deleted.'
     return redirect('login')
