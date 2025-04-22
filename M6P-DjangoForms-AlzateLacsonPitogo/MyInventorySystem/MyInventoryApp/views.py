@@ -52,24 +52,33 @@ def signup(request):
         return render(request, 'MyInventoryApp/signup.html')
 
 def view_bottles(request):
-    # Show all bottles in the system
-    bottles = WaterBottle.objects.all()
-    return render(request, 'MyInventoryApp/view_bottles.html', {
-        'bottles': bottles
-    })
+    global current_user
+    if current_user:
+        # Show all bottles in the system
+        bottles = WaterBottle.objects.all()
+        return render(request, 'MyInventoryApp/view_bottles.html', {
+            'bottles': bottles,
+            'user':current_user
+        })
+    else:
+        return redirect('login')
 
 def view_bottle_details(request, pk):
-    bottle = get_object_or_404(WaterBottle, pk=pk)
+    global current_user
+    if current_user:
+        bottle = get_object_or_404(WaterBottle, pk=pk)
 
-    # Handle the Delete button
-    if request.method == "POST" and "delete" in request.POST:
-        bottle.delete()
-        return redirect("view_bottles")
+        # Handle the Delete button
+        if request.method == "POST" and "delete" in request.POST:
+            bottle.delete()
+            return redirect("view_bottles")
 
-    # Otherwise just render the details page
-    return render(request, "MyInventoryApp/view_bottle_details.html", {
-        "bottle": bottle
-    })
+        # Otherwise just render the details page
+        return render(request, "MyInventoryApp/view_bottle_details.html", {
+            "bottle": bottle
+        })
+    else:
+        return redirect('login')
 
 
 def delete_bottle(request, bottle_id):
@@ -86,56 +95,62 @@ def view_supplier(request):
     global current_user
     if current_user:
         supplier_objects = Supplier.objects.all()
-        return render(request, 'MyInventoryApp/view_supplier.html', {'supplier':supplier_objects})
+        return render(request, 'MyInventoryApp/view_supplier.html', {'supplier':supplier_objects, 'user':current_user})
     else:
         return redirect('login')
 
 def add_bottle(request):
-    if request.method == 'POST':
+    global current_user
+    if current_user:
+        if request.method == 'POST':
 
-        sku = request.POST.get('sku')
-        brand = request.POST.get('brand')
-        cost = request.POST.get('cost')
-        size = request.POST.get('size')
-        mouth_size = request.POST.get('mouth_size')
-        color = request.POST.get('color')
-        quantity = request.POST.get('quantity')
-        supplier_id = request.POST.get('supplier')
+            sku = request.POST.get('sku')
+            brand = request.POST.get('brand')
+            cost = request.POST.get('cost')
+            size = request.POST.get('size')
+            mouth_size = request.POST.get('mouth_size')
+            color = request.POST.get('color')
+            quantity = request.POST.get('quantity')
+            supplier_id = request.POST.get('supplier')
 
-        if not all([sku, brand, cost, size, mouth_size, color, quantity, supplier_id]):
-            return render(request, 'MyInventoryApp/add_bottle.html', {
-                'supplier': Supplier.objects.all(),
-                'message': 'Please fill out all fields before confirming.'
-            })
+            if not all([sku, brand, cost, size, mouth_size, color, quantity, supplier_id]):
+                return render(request, 'MyInventoryApp/add_bottle.html', {
+                    'supplier': Supplier.objects.all(),
+                    'message': 'Please fill out all fields before confirming.'
+                })
 
-        try:
-            supplier = Supplier.objects.get(id=supplier_id)
-        except Supplier.DoesNotExist:
-            return render(request, 'MyInventoryApp/add_bottle.html', {
-                'supplier': Supplier.objects.all(),
-                'message': 'Selected supplier does not exist.'
-            })
+            try:
+                supplier = Supplier.objects.get(id=supplier_id)
+            except Supplier.DoesNotExist:
+                return render(request, 'MyInventoryApp/add_bottle.html', {
+                    'supplier': Supplier.objects.all(),
+                    'message': 'Selected supplier does not exist.'
+                })
 
-        WaterBottle.objects.create(
-            sku=sku,
-            brand=brand,
-            cost=cost,
-            size=size,
-            mouth_size=mouth_size,
-            color=color,
-            supplier=supplier,
-            current_quantity=quantity
-        )
+            WaterBottle.objects.create(
+                sku=sku,
+                brand=brand,
+                cost=cost,
+                size=size,
+                mouth_size=mouth_size,
+                color=color,
+                supplier=supplier,
+                current_quantity=quantity
+            )
 
-        return redirect('view_bottles')
+            return redirect('view_bottles')
 
-    return render(request, 'MyInventoryApp/add_bottle.html', {
-        'supplier': Supplier.objects.all()
-    })
+        return render(request, 'MyInventoryApp/add_bottle.html', {
+            'supplier': Supplier.objects.all(),
+            'user':current_user
+        })
+    else:
+        return redirect('login')
 
     
 def logout_view(request):
-    request.session.flush()
+    global current_user
+    current_user = None
     return redirect('login')
 
 def change_password(request, pk):
@@ -176,7 +191,6 @@ def change_password(request, pk):
     else:
         return redirect('login')
 
-
     
 def manage_account(request, pk):
     global current_user
@@ -190,7 +204,6 @@ def manage_account(request, pk):
         else:
             user = get_object_or_404(Account, pk=pk)
             message = request.session.pop('message', None)
-            print(f"Message popped from session: {message}") 
             return render(request, 'MyInventoryApp/manage_account.html', {'user':user, 'message':message})
     else:
         return redirect('login')

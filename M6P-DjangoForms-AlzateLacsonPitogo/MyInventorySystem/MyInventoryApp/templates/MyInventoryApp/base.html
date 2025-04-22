@@ -17,11 +17,9 @@
                     <a href="{% url 'add_bottle' %}" class="btn btn-sm btn-success me-2">
                         Add Bottle
                     </a>
-                    {% comment %}
-                    <a href="{% url 'manage_account' request.session.account_id %}" class="btn btn-sm btn-warning me-2">
+                    <a href="{% url 'manage_account' pk=user.pk %}" class="btn btn-sm btn-warning me-2">
                         Manage Account
                     </a>
-                    {% endcomment %}
                     <a href="{% url 'logout' %}" class="btn btn-sm btn-danger">
                         Logout
                     </a>
@@ -29,6 +27,8 @@
             </div>
         </nav>
 
+        {% block alert %}
+        {% endblock %}
 
         <div class="container">
             <div class="row">
