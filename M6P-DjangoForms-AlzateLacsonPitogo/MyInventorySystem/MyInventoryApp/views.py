@@ -119,6 +119,12 @@ def add_bottle(request):
                     'message': 'Please fill out all fields before confirming.'
                 })
 
+            if WaterBottle.objects.filter(sku=sku).exists():
+                    return render(request, 'MyInventoryApp/add_bottle.html', {
+                        'supplier': Supplier.objects.all(),
+                        'message': 'A bottle with this SKU already exists.'
+                    })
+                
             try:
                 supplier = Supplier.objects.get(id=supplier_id)
             except Supplier.DoesNotExist:
